@@ -1,0 +1,89 @@
+
+dt = 0.1;
+hw = 0.1;
+
+x=ones(3,1);
+v=zeros(3,1);
+d=0;
+Pe=0;
+Pg=0;
+tau=1;
+state = 0;
+t=1;
+tp=0;
+
+while 1
+
+  ts(t) = t;
+  xs(t,:) = x;
+  vs(t,:) = v;
+  states(t) = state;
+  
+  t = t + 1;
+  x = x + v*dt;
+
+  r = rand();
+  if( state == 0 )
+    if( r < Pe )
+      state = 1;
+      #this following part is totally not right.
+      [maxes,imax] = max(cat(1,x,-x))
+      switch (imax)
+	case 1
+	  v(1) -= hw;
+	case 2
+	  v(2) -= hw;
+	case 3
+	  v(3) -= hw;
+	case 4
+	  v(1) += hw;
+	case 5
+	  v(2) += hw;
+	case 6
+	  v(3) += hw;
+	otherwise
+	  break;
+	  break;
+	  break;
+	  break;
+      end
+
+      tp = 0;
+      Pe = 0;
+    else 
+      tp = tp + dt;
+      Pe = 1;
+    end
+  elseif( state == 1 )
+    if( r < Pg )
+      state = 0;    
+      theta = rand()*pi;
+      phi = rand()*2*pi;
+      v += hw*[cos(phi)*sin(theta);sin(phi)*sin(theta);cos(theta)];
+      tp = 0;
+      Pg = 0;
+    else
+      tp = tp + dt;
+      Pg = 1-exp(-tp/tau);
+    end
+  end
+
+    subplot(2, 3, 1)
+    plot(ts,xs(:,1))
+    axis([t-20,t,-1.5,1.5])
+    subplot(2, 3, 2)
+    plot(ts,xs(:,2))
+    axis([t-20,t,-1.5,1.5])
+    subplot(2, 3, 3)
+    plot(ts,xs(:,3))
+    axis([t-20,t,-1.5,1.5])
+#    subplot(2, 3, 4)
+#    plot(ts,abs(xs(1,:)))
+#    subplot(2, 3, 5)
+#    plot(ts,abs(vs(1,:)))
+    subplot(2, 3, 6)
+    plot(ts,states)
+    axis([t-20,t,-0.2,1.2])
+
+    pause(0.1)
+end

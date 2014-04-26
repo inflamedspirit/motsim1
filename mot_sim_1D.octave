@@ -1,0 +1,90 @@
+buffer_length = 1000;
+xs = zeros(1,buffer_length);
+vs = zeros(1,buffer_length);
+ts = 1:buffer_length;
+states = zeros(1,buffer_length);
+
+dt = 0.1;
+hw = 0.1;
+
+x=0;
+v=0;
+d=0;
+Pe=llo0;
+Pg=0;
+tau=1;
+state = 0;
+t=1;
+tp=0;
+
+
+
+while 1
+
+  ts(1+mod(t,buffer_length)) = t;
+  xs(1+mod(t,buffer_length)) = x;
+  vs(1+mod(t,buffer_length)) = v;
+  states(t) = state;
+  
+  t = t + 1;
+  x = x + v*dt;
+
+  r = rand();
+  if( state == 0 )
+    if( r < Pe )
+      state = 1;
+      if(x>0)
+	v -= hw;
+      else
+	v += hw;
+      end
+
+      tp = 0;
+      Pe = 0;
+    else 
+      tp = tp + dt;
+      Pe = 1;
+    end
+  elseif( state == 1 )
+    if( r < Pg )
+      state = 0;
+      if(rand()>0.5)
+	v += hw;
+      else
+	v -= hw;
+      end
+      tp = 0;
+      Pg = 0;
+    else
+      tp = tp + dt;
+      Pg = 1-exp(-tp/tau);
+    end
+  end
+
+
+  comps_per_frame = 10;
+  xrange = 100;
+  yrange = 5;
+
+  if(mod(t,comps_per_frame) == 1)
+
+    tsp = circshift(ts,[0,xrange-t])(1:xrange);
+    xsp = circshift(xs,[0,xrange-t])(1:xrange);
+    vsp = circshift(vs,[0,xrange-t])(1:xrange);
+    statesp = circshift(states,[0,xrange-t])(1:xrange);
+ 
+    subplot(2, 3, 1)
+    plot(tsp,xsp)
+    axis([t-xrange,t,min(-yrange,min(xs)),max(yrange,max(xs))])
+
+    subplot(2, 3, 2)
+    plot(tsp,vsp)
+    axis([t-xrange,t,min(-yrange,min(vs)),max(yrange,max(vs))])
+
+    subplot(2, 3, 6)
+    plot(tsp,statesp)
+    axis([t-xrange,t,-0.2,1.2])
+
+    pause(0.1)
+  end
+end

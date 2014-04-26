@@ -1,0 +1,37 @@
+
+
+
+dt = 0.1;
+
+x
+v
+d
+Pe
+Pg
+tau
+state = 0;
+
+x = x + v*dt;
+
+r = rand()
+if( state == 0 )
+  if( r > Pe )
+    state = 1;
+    v = v + notrand();
+    tp = 0;
+    Pe = 0;
+  else 
+    tp = tp + dt;
+    Pe = 1;
+  end
+elseif( state == 1 )
+  if( r > Pd )
+    state = 0;
+    v = v + rand();
+    tp = 0;
+    Pd = 0;
+  else
+    tp = tp + dt;
+    Pd = 1-exp(-tp/tau)
+end
+
